@@ -76,7 +76,7 @@ function server(request, response) {
     console.log("ENTERED HTML");
     console.log("urlRequest: " + urlRequest);
 
-    filePath = path.join(__dirname, '..', '/web', urlRequest);
+    filePath = path.join(__dirname, urlRequest);
     console.log(filePath);
 
     sendFileContent(response, filePath, "text/html");
@@ -84,7 +84,7 @@ function server(request, response) {
     console.log("ENTERED JAVASCRIPT");
     console.log("urlRequest: " + urlRequest);
 
-    filePath = path.join(__dirname, '..', '/web', urlRequest);
+    filePath = path.join(__dirname, urlRequest);
     console.log(filePath);
 
     sendFileContent(response, filePath, "text/javascript");
@@ -92,7 +92,7 @@ function server(request, response) {
     console.log("ENTERED CSS");
     console.log("urlRequest: " + urlRequest);
 
-    filePath = path.join(__dirname, '..', '/web', urlRequest);
+    filePath = path.join(__dirname, urlRequest);
 
     console.log(filePath);
     sendFileContent(response, filePath, "text/css");
