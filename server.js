@@ -145,14 +145,12 @@ io.on('connection', function(socket) {
     //will need to use json-sockets with this
     socket.emit('welcome', {message: 'Welcome to CourseConnect!'});
 
-
-
     //send to the client the list of users of each user every 10 seconds
     setInterval(
       function peopleInSpaces() {
         //returns key-value pair called "dictionary," which is a dictionary of rooms-numPeople
         socket.emit('spaces', {dictionary: getNumPeople()} );
-    }, 10000);
+    }, 1000);
 
     //listen for the userID data
     //consolidate and compile received client data to a set
@@ -212,7 +210,7 @@ io.on('connection', function(socket) {
       setInterval(
         function showSpaceStuff(){
           socket.emit('show space stuff', {posts: spaceDict[space], numPeople: getNumPeople()[space] })
-        }, 10000);
+        }, 1000);
     });
 
 
@@ -221,18 +219,21 @@ io.on('connection', function(socket) {
       var name = info.userName;
       var userID = info.publicUserID;
       var personID = info.publicPersonID;
-      googleDict[personID][1].emit('receive ping', {publicUserID: userID, requestorName: name});
+      googleDict[personID][1].emit('receive ping', {publicUserID: userID, publicPersonID: personID, requestorName: name});
     });
 
 
-    //person (called user below) accepts ping
-    //user (called person below) receives ack
+    // TODO: verify that the first round of pinging/accepting actually happened?
+    // OTHER accepted ping
+    // THIS USER (who initiated the ping) will receive ack
     socket.on('accept ping', function receiveAck(info){
-      var userID = info.publicUserID;
-      var personID = info.publicPersonID;
-      var email = googleDict[userID][2];
+      var otherID = info.publicUserID;
+      var thisID = info.publicPersonID;
+      var otherName = info.userName;
+      var email = googleDict[otherID][2];
+      // console.log(otherID + " is accepting ping for", thisID);
 
-      googleDict[personID][1].emit('receive ack', {publicUserID: userID, emailInfo: email});
+      googleDict[thisID][1].emit('receive ack', {personName: otherName, emailInfo: email});
     });
 
 });

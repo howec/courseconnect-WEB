@@ -25,7 +25,11 @@ $(document).ready(function() {
   // google auth signin
   window.onSignIn = function (googleUser) {
     // save off the googleUser
+    // TODO: is this secure?
     gUser = googleUser;
+    // TODO: deal with auth/security concerns re: google id's
+    // https://developers.google.com/identity/sign-in/web/people
+    // https://developers.google.com/identity/sign-in/web/backend-auth
     gUserID = gUser.getBasicProfile().getId();
 
     var profile = googleUser.getBasicProfile();
@@ -63,7 +67,6 @@ $(document).ready(function() {
   function showStudySpace(chosenSpace) {
     console.log("going to study space", chosenSpace);
     socket.emit('chosen space', {studySpace: chosenSpace});
-    socket.on('show space stuff', spaceStuff);
 
     // set title of page to be the chosen studySpace
     $("#studySpaceName").text(chosenSpace);
@@ -137,9 +140,6 @@ $(document).ready(function() {
   }
 
 
-
-  //<<<Howe's Client-side Socket Code>>>
-
   //should reconstruct the dictionary sent from the event 'spaces' for use in client
   socket.on('welcome', function welcomeUser(info){
     var message = info.message;
@@ -148,14 +148,11 @@ $(document).ready(function() {
 
   socket.on('spaces', function readSpaces(info){
     spaceDictionary = info.dictionary
-    console.log("space dict", spaceDictionary);
   });
 
   function spaceStuff(info){
-    //not sure if I have to convert this back into a list?
     var postsList = info.posts; //contains a list of all [user, post] entries from the server... ie. [[user, post]...]
     var numberOfPeople = info.numPeople;
-    console.log(info);
 
     // clear div and re-render each item in postsList
     $('#postings').empty();
@@ -191,7 +188,6 @@ $(document).ready(function() {
     }
   };
 
-  //this is the second place that I have the event 'show space stuff'
   socket.on('show space stuff', spaceStuff);
 
   //should emit the event 'remove user' to server
@@ -199,13 +195,6 @@ $(document).ready(function() {
     socket.emit('remove user', {googleUser: gUser, googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
     return;
   });
-
-  //function call to editPost
-  // TODO: finish implementation
-  function editPost(){
-    post();
-    socket.emit('update posting', {googleUser: gUser, googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
-  }
 
   // THIS USER wants to connect to SOMEONE ELSE
   function requestConnection(otherUserID, otherUserName) {
@@ -215,26 +204,45 @@ $(document).ready(function() {
     alert("You sent a ping to " + otherUserName + "!");
   }
 
-  //NOTE: Jessie, you might want to display the information in here in another window
-  socket.on('receive ack', function receiveAck(info){
-    var otherEmail = info.emailInfo;
-    var otherPersonID = info.publicUserID;
-  });
-
-
-  //NOTE: Jessie, you'll need to do something here too
-  //SOMEONE wants to connect to the USER
-  //receive a ping that someone sent you. You can either ACCEPT or REJECT
+  // SOMEONE wants to connect to this USER
+  // receive a ping that someone sent you. You can either ACCEPT or REJECT
   socket.on('receive ping', function receivePing(info){
-    var somePersonID = info.publicPersonID;
+    var otherID = info.publicPersonID;
+    var otherName = info.requestorName;
+    var name = gUser.getBasicProfile().getName();
+    console.log("received ping from", otherName);
 
-    //TODO: some message that pops up in the tab that indicates someone wants to connect
-    var decision = null; //make this dependent on the event listener for whether to accept (true) or reject (false) the request
+    // unbind listeners first
+    $('#acceptPing').off('click');
+    $('#ignorePing').off('click');
+    
+    // functions for USER to accept or ignore ping from OTHER;
+    $('#acceptPing').on('click', function (e) {
+      socket.emit('accept ping', {userName: name, publicUserID: gUserID, publicPersonID: otherID});
+      $('#receivePing').css("display", "none");
+    });
+    $('#ignorePing').on('click', function (e) {
+      $('#receivePing').css("display", "none");
+    });
 
-    if(decision === true){
-      //accept the ping
-      socket.emit('accept ping', {publicUserID: gUserID, publicPersonID: somePersonID});
-    }
+    // display the ping
+    $('#receivePingText').text(otherName + " wants to meet up with you!");
+    $('#receivePing').css("display", "block");
   });
+
+  socket.on('receive ack', function receiveAck(info){
+    var otherName = info.personName;
+    var otherEmail = info.emailInfo;
+
+    // TODO: what's a "longer-lasting" solution?
+    alert(otherName + " wants to meet with you, too! Their email is: " + otherEmail);
+  });
+
+  //function call to editPost
+  // TODO: finish implementation
+  function editPost(){
+    post();
+    socket.emit('update posting', {googleUser: gUser, googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
+  }
 
 }); // closure
