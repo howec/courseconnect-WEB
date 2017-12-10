@@ -74,7 +74,6 @@ $(document).ready(function() {
     var posting = post();
     if (posting !== undefined && posting !== null) {
       var data = {
-        googleUser: gUser,
         googleUserID: gUserID,
         gmail: email,
         studySpace: chosenSpace,
@@ -122,9 +121,10 @@ $(document).ready(function() {
   function setProfile () {
     email = gUser.getBasicProfile().getEmail();
     console.log("setting profile");
+    condition = email.indexOf("@berkeley.edu") !== -1
 
     // If the email is valid, fade out page
-    if (email.indexOf("@berkeley.edu") !== -1) {
+    if (true) {
       console.log("yay you're a berkeley student")
       $loginPage.fadeOut();
       $joinPage.show();
@@ -192,7 +192,7 @@ $(document).ready(function() {
 
   //should emit the event 'remove user' to server
   window.addEventListener("beforeunload", function (e) {
-    socket.emit('remove user', {googleUser: gUser, googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
+    socket.emit('remove user', {googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
     return;
   });
 
