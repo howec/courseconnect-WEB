@@ -129,7 +129,7 @@ $(document).ready(function() {
       $loginPage.fadeOut();
       $joinPage.show();
       $loginPage.off('click');
-    } else {
+    } else {u
       alert("Sorry, you're not a Berkeley student!");
     }
   }
@@ -171,7 +171,7 @@ $(document).ready(function() {
               posting.topic +
             '</li>' +
           '</ul>' +
-          '<div class="panel-body">' +
+          '<div class="panel-body" id="' + posting.name + '">' +
             '<button class="btn btn-info" id="' + userID + '">' +
               'Connect with ' + posting.name +
             '</button>' +
@@ -183,7 +183,7 @@ $(document).ready(function() {
       $('#postings').off('click', '#' + userID);
       // add new click listener to the 'connect' button of each div
       $('#postings').on('click', '#' + userID, function (e) {
-        requestConnection(userID, posting.name);
+        requestConnection($(this).attr("id"), $(this).parent().attr("id"));
       });
     }
   };
