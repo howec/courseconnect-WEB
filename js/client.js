@@ -176,17 +176,28 @@ $(document).ready(function() {
   function setProfile () {
     email = gUser.getBasicProfile().getEmail();
     console.log("setting profile");
-    condition = email.indexOf("@berkeley.edu") !== -1
 
-    // If the email is valid, fade out page
-    if (true) {
-      console.log("yay you're a berkeley student")
-      $loginPage.fadeOut();
-      $joinPage.show();
-      $loginPage.off('click');
-    } else {u
-      alert("Sorry, you're not a Berkeley student!");
-    }
+    socket.emit('check duplicate', {googleUserID: gUserID});
+
+    socket.on('duplicate user', function check(info){
+      var condition = info.condition;
+      if(condition == true){
+        alert("You've logged in already.");
+        console.log("number of times")
+      } else {
+        // If the email is valid, fade out page
+        if (email.indexOf("@berkeley.edu") !== -1) {
+          console.log("yay you're a berkeley student")
+          $loginPage.fadeOut();
+          $joinPage.show();
+          $loginPage.off('click');
+          socket.emit('active user', {googleUserID: gUserID});
+        } else {
+          alert("Sorry, you're not a Berkeley student!");
+        }
+      }
+    });
+
   }
 
   // Prevents input from having injected markup
