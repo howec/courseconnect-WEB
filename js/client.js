@@ -80,22 +80,17 @@ $(document).ready(function() {
     $connectPage.hide();
     $connectPage.off('click');
     $joinPage.fadeToggle();
-    socket.emit('remove user', {googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
+    socket.emit('remove user', {googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting, socketID: socket});
   }
   // ------------------------------------------------------------
 
 
   // emits user's chosen space and posting to the server
   function showStudySpace(chosenSpace) {
-    console.log("going to study space", chosenSpace);
-    console.log("number of people", spaceDictionary[chosenSpace]);
-    socket.emit('chosen space', {studySpace: chosenSpace});
-
-    // set title of page to be the chosen studySpace
-    $("#studySpaceName").text(chosenSpace);
-
     var posting = post();
-    if (posting !== undefined && posting !== null) {
+
+    // only go to study space if posting is valid
+    if (posting != undefined && posting != null) {
       var data = {
         googleUserID: gUserID,
         gmail: email,
@@ -104,6 +99,12 @@ $(document).ready(function() {
       };
       console.log("adding user");
       socket.emit("add user", data);
+
+      // set title of page to be the chosen studySpace
+      $("#studySpaceName").text(chosenSpace);
+      console.log("going to study space", chosenSpace);
+      console.log("number of people", spaceDictionary[chosenSpace]);
+      socket.emit('chosen space', {studySpace: chosenSpace});
 
       $joinPage.fadeToggle();
       $connectPage.show();
@@ -174,7 +175,7 @@ $(document).ready(function() {
       alert("You've logged in already.");
     } else {
       // If the email is valid, fade out page
-      if (email.indexOf("@berkeley.edu") !== -1) {
+      if (email.indexOf("@berkeley.edu") !== -1 || email.indexOf(".berkeley.edu") !== -1) {
         console.log("user is a berkeley student");
         $loginPage.fadeOut();
         $joinPage.show();
