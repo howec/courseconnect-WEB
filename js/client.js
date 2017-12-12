@@ -45,23 +45,23 @@ $(document).ready(function() {
   // takes user to the chosen space
   $('#coryHall').on('click', function (e) {
     chosenSpace = 'Cory Hall';
-    showStudySpace(chosenSpace);
+    showStudySpace(chosenSpace, spaceDictionary[chosenSpace]);
   });
   $('#sodaHall').on('click', function (e) {
     chosenSpace = 'Soda Hall';
-    showStudySpace(chosenSpace);
+    showStudySpace(chosenSpace, spaceDictionary[chosenSpace]);
   });
   $('#mlk').on('click', function (e) {
     chosenSpace = 'MLK Student Union';
-    showStudySpace(chosenSpace);
+    showStudySpace(chosenSpace, spaceDictionary[chosenSpace]);
   });
   $('#moffittLibrary').on('click', function (e) {
     chosenSpace = 'Moffitt Library';
-    showStudySpace(chosenSpace);
+    showStudySpace(chosenSpace, spaceDictionary[chosenSpace]);
   });
   $('#doeLibrary').on('click', function (e) {
     chosenSpace = 'Doe Library';
-    showStudySpace(chosenSpace);
+    showStudySpace(chosenSpace, spaceDictionary[chosenSpace]);
   });
 
 
@@ -72,12 +72,14 @@ $(document).ready(function() {
 
 
   // emits user's chosen space and posting to the server
-  function showStudySpace(chosenSpace) {
+  function showStudySpace(chosenSpace, numPeople) {
     console.log("going to study space", chosenSpace);
     socket.emit('chosen space', {studySpace: chosenSpace});
 
     // set title of page to be the chosen studySpace
     $("#studySpaceName").text(chosenSpace);
+
+    $("#numPeopleInRoom").text(numPeople);
 
     var posting = post();
     if (posting !== undefined && posting !== null) {
